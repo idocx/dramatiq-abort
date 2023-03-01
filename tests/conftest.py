@@ -57,6 +57,13 @@ def redis_event_backend() -> evt_backends.RedisBackend:
 
 
 @pytest.fixture
+def mongodb_event_backend() -> evt_backends.MongoDBBackend:
+    return evt_backends.MongoDBBackend.create_backend(
+        "localhost", 27017, "test_dramatiq_abort", "test"
+    )
+
+
+@pytest.fixture
 def stub_event_backend() -> evt_backends.StubBackend:
     return evt_backends.StubBackend()
 
@@ -65,14 +72,16 @@ def stub_event_backend() -> evt_backends.StubBackend:
 def event_backends(
     redis_event_backend: evt_backends.RedisBackend,
     stub_event_backend: evt_backends.StubBackend,
+    mongodb_event_backend: evt_backends.MongoDBBackend
 ) -> Dict[str, EventBackend]:
     return {
         "redis": redis_event_backend,
         "stub": stub_event_backend,
+        "mongodb": mongodb_event_backend,
     }
 
 
-@pytest.fixture(params=["redis", "stub"])
+@pytest.fixture(params=["redis", "stub", "mongodb"])
 def event_backend(
     request: Any, event_backends: Dict[str, EventBackend]
 ) -> EventBackend:

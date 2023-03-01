@@ -1,6 +1,7 @@
 import warnings
 
 from .stub import StubBackend
+from .mongodb import MongoDBBackend
 
 try:
     from .redis import RedisBackend
@@ -12,4 +13,4 @@ except ImportError:  # pragma: no cover
     )
 
 
-__all__ = ["StubBackend", "RedisBackend"]
+__all__ = ["StubBackend", "RedisBackend", "MongoDBBackend"]
