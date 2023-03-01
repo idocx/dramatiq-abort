@@ -4,7 +4,7 @@ from typing import Iterable, Optional
 
 import pymongo
 from pymongo import MongoClient
-from pymongo.database import Database
+from pymongo.collection import Collection
 from ..backend import Event, EventBackend
 
 
@@ -15,10 +15,8 @@ class MongoDBBackend(EventBackend):
     :param collection_name: Collection to prefix keys with.
     """
 
-    def __init__(self, *, database: Database, collection_name: str) -> None:        
-        self.database = database
-        self.collection_name = collection_name
-        self.collection = self.database[collection_name]
+    def __init__(self, *, collection: Collection) -> None:        
+        self.collection = collection
         self.collection.create_index([("key", pymongo.HASHED)])
         self.collection.create_index("remove_at", expireAfterSeconds=0)
 
@@ -27,8 +25,9 @@ class MongoDBBackend(EventBackend):
         client = MongoClient(host=host, port=port)
 
         db = client[db_name]
+        collection = db[collection_name]
 
-        return cls(database=db, collection_name=collection_name)
+        return cls(collection=collection)
 
     def wait_many(self, keys: Iterable[str], timeout: int) -> Optional[Event]:
         assert timeout is None or timeout >= 1000, "wait timeouts must be >= 1000"
